@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Project | Kanban Boards </title>
+    <object th:remove="tag" th:include="fragment :: header"></object>
+    <!-- Dragula css -->
+    <link href='/static/dist/dragula.css' th:href="@{/dist/dragula.css}"  rel='stylesheet' type='text/css' />
+    <!-- HtmlEditor -->
+    <link rel="stylesheet" href="/heditor/jquery.wysiwyg.css" type="text/css"        media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="/heditor/src/dialogs/default.css" type="text/css"  media="screen" charset="utf-8" />
+    <!-- Bootstrap -->
+    <!--Kendo UI -->
+    <link rel="stylesheet" href="http://kendo.cdn.telerik.com/2016.2.504/styles/kendo.common.min.css" />
+    <style>
+        .sticky-heading {
+            cursor: grabbing;
+            cursor: -moz-grabbing;
+            cursor: -webkit-grabbing;
+        }
+        .alert-label{
+            width:15px;
+            height:15px;
+        }
+        .sticky-action{
+            margin-bottom: 10px;
+        }
+        .sticky-control{
+            margin-right: 5px;
+            cursor: pointer;
+        }
+        tr .container{
+            width:auto;
+        }
+        td .panel{
+            min-width: 140px;
+        }
+        #table-tasks{
+            resize: both;
+            overflow: auto;
+        }
+        .panel-heading{
+            font-size: 11px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-right: 1px;
+            padding-left: 4px;
+        }
+        .panel-body{
+            font-size: 11px;
+            font-style: italic;
+        }
+        /*        .panel-heading span
+                {
+                    margin-top: -26px;
+                    font-size: 15px;
+                    margin-right: -12px;
+                }*/
+
+        /*        .clickable {
+                    background: rgba(0, 0, 0, 0.15);
+                    display: inline-block;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                }*/
+    </style>
+</head>
+
+<body class="nav-sm">
+    <div class="container body">
+        <div class="main_container">
+            <!-- Left Column -->
+            <div th:remove="tag" th:replace="fragment :: left-column"></div>
+            <!--  End of left Column -->
+
+            <!-- top navigation -->
+            <div th:remove="tag" th:replace="fragment :: top-header"></div>
+            <!-- /top navigation -->
+
+            <!-- page content -->
+            <div class="right_col" role="main">
+                <div class="">
+                    <div class="page-title">
+                        <div class="title_left">
+                            <h3 id="projectTitle" th:if="${project != null}" th:text="${project.title}" th:attr="data-id=${project.id}">
+                                Project ???
+                            </h3>
+                        </div>
+
+                        <!--                        <div class="title_right">
+                                                    <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control" placeholder="Search for...">
+                                                            <span class="input-group-btn">
+                                                                <button class="btn btn-default" type="button">Go!</button>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>-->
+                    </div>
+                    <div class="clearfix"></div>
+
+                    <div class="row">
+
+                        <div class="col-md-12 col-sm-12 col-xs-12" >
+                            <div class="x_panel" style="min-height:600px;">
+                                <div class="x_title">
+                                    <h2>Kanban Board</h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><button id="add-new" class="btn btn-info"
+                                                    data-toggle="modal" data-target="#exampleModal">New
+                                                Task/Story</button></li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div style="overflow: scroll; overflow-y:hidden;" >
+                                    <!--                                    <table border="1" id="table-test">
+                                                                            <tr><th colspan="2">Left</th><th>Right</th></tr>
+                                                                            <tr><td>First Content</td><td>Span Test</td><td>Second Content</td></tr>
+                                                                        </table>-->
+                                    <table class="table table-bordered" id="table-tasks">
+                                        <thead>
+                                            <tr class="headings">
+                                                <th>Backlog</th>
+                                                <th colspan="2">Tasks</th>
+                                                <th colspan="3">In Progress</th>
+                                                <th colspan="2">Testing</th>
+                                                <th>Done</th>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th>Processing</th>
+                                                <th>Done</th>
+                                                <th>Processing</th>
+                                                <th>Track</th>
+                                                <th>Done</th>
+                                                <th>Processing</th>
+                                                <th>Done</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tr class="sticky-notes" valign="top">
+                                            <!--Backlog-->
+                                            <td id="backlog" class="container sticky-column">
+                                                <object th:remove="tag"  th:each="backlog, iStatus : ${backlogs}">
+                                                    <div class="panel panel-info" th:class="@{panel}+' '+${backlog.color}" th:attr="data-id=${backlog.id}">
+                                                        <div class="panel-heading sticky-heading">
+
+                                                            <object class="sticky-title" th:text="${backlog.title}"></object>
+                                                            <div class="pull-right">
+                                                                <i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> 
+                                                                <i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>
+                                                            </div>
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="panel-body"  th:utext="${backlog.description}"></div>
+                                                    </div>
+                                                </object>
+                                            </td>
+                                            <!--Tasks-->
+                                            <td id="tasks-progress" class="container">
+                                                <object th:remove="tag"  th:each="item, iStatus : ${tasksProgress}">
+                                                    <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                        <div class="panel-heading sticky-heading">
+
+                                                            <object class="sticky-title" th:text="${item.title}"></object>
+                                                            <div class="pull-right">
+                                                                <i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> 
+                                                                <i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>
+                                                            </div>
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="panel-body"  th:utext="${item.description}"></div>
+                                                    </div>
+                                                </object>
+                                            </td>
+                                            <td id="tasks-done" class="container">
+                                                <object th:remove="tag"  th:each="item, iStatus : ${tasksDone}">
+                                                    <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                        <div class="panel-heading sticky-heading">
+
+                                                            <object class="sticky-title" th:text="${item.title}"></object>
+                                                            <div class="pull-right">
+                                                                <i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> 
+                                                                <i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>
+                                                            </div>
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="panel-body"  th:utext="${item.description}"></div>
+                                                </object>
+                                            </td>
+                                            <!--End of Tasks-->
+                                            <!--In progress-->
+                                            <td id="progress-progress" class="container">
+                                                <object th:remove="tag"  th:each="item, iStatus : ${progressProgress}">
+                                                    <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                        <div class="panel-heading sticky-heading">
+
+                                                            <object class="sticky-title" th:text="${item.title}"></object>
+                                                            <div class="pull-right">
+                                                                <i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> 
+                                                                <i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>
+                                                            </div>
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="panel-body"  th:utext="${item.description}"></div>
+                                                </object>
+                                            <td id="progress-track" class="container">
+                                                <object th:remove="tag"  th:each="item, iStatus : ${progressTrack}">
+                                                    <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                        <div class="panel-heading sticky-heading">
+
+                                                            <object class="sticky-title" th:text="${item.title}"></object>
+                                                            <div class="pull-right">
+                                                                <i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> 
+                                                                <i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>
+                                                            </div>
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="panel-body"  th:utext="${item.description}"></div>
+                                                </object>
+                                            </td>
+                                            <td id="progress-done" class="container">
+                                                <object th:remove="tag"  th:each="item, iStatus : ${progressDone}">
+                                                    <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                        <div class="panel-heading sticky-heading">
+
+                                                            <object class="sticky-title" th:text="${item.title}"></object>
+                                                            <div class="pull-right">
+                                                                <i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> 
+                                                                <i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>
+                                                            </div>
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="panel-body"  th:utext="${item.description}"></div>
+                                                </object>
+                                            </td>
+                                            <!--End of Progress-->
+                                            <!--Testing-->
+                                            <td id="testing-processing" class="container">                                                    
+                                                <object th:remove="tag"  th:each="item, iStatus : ${testingProcessing}">
+                                                    <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                        <div class="panel-heading sticky-heading">
+
+                                                            <object class="sticky-title" th:text="${item.title}"></object>
+                                                            <div class="pull-right">
+                                                                <i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> 
+                                                                <i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>
+                                                            </div>
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="panel-body"  th:utext="${item.description}"></div>
+                                                </object>
+                                            </td>
+
+                                            <!--Done-->
+                                            <td id="testing-done" class="container">
+                                                <object th:remove="tag"  th:each="item, iStatus : ${testingDone}">
+                                                    <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                        <div class="panel-heading sticky-heading">
+
+                                                            <object class="sticky-title" th:text="${item.title}"></object>
+                                                            <div class="pull-right">
+                                                                <i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> 
+                                                                <i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>
+                                                            </div>
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="panel-body"  th:utext="${item.description}"></div>
+                                                </object>
+                                            </td>
+                                            <!--End of Done-->
+                                            <td id="done" class="container">
+                                                <object th:remove="tag"  th:each="item, iStatus : ${done}">
+                                                    <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                        <div class="panel-heading sticky-heading">
+
+                                                            <object class="sticky-title" th:text="${item.title}"></object>
+                                                            <div class="pull-right">
+                                                                <i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> 
+                                                                <i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>
+                                                            </div>
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="panel-body"  th:utext="${item.description}"></div>
+                                                </object>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /page content -->
+
+            <!-- footer content -->
+            <div th:remove="tag" th:replace="fragment :: footer"></div>
+            <!-- /footer content -->
+        </div>
+    </div>
+    <!--New Task Model-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">New Task/Story</h4>
+                </div>
+                <form class="form-horizontal form-label-left" novalidate th:if="${project != null}"
+                      th:action="@{/projects/{projectId}/(projectId = ${project.id})}" id="project-form" method="POST">
+                    <div class="modal-body">
+
+                        <div id="form-response"></div>
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="name">Title <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input id="title" class="form-control col-md-7 col-xs-12"
+                                       data-validate-length-range="6" data-validate-words="2"
+                                       name="name" placeholder="both name(s) e.g Jon Doe"
+                                       required="required" type="text">
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="telephone">Color <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input id="radio-danger" type="radio" name="color" value="panel-danger"> <span style="color:#d9534f;">Red</span><br/>
+                                <input id="radio-primary"  type="radio" name="color" value="panel-primary"> <span style="color:#337ab7;">Blue</span><br/>
+                                <input id="radio-info"  type="radio" name="color" value="panel-info" checked> <span style="color:#5bc0de;"> Light Blue</span><br>
+                                <input id="radio-success"  type="radio" name="color" value="panel-success"><span style="color:#26B99A;"> Green</span><br/> 
+                                <input id="radio-warning"  type="radio" name="color" value="panel-warning"> <span style="color:#f0ad4e;">Orange</span><br/> 
+                                <input id="radio-default"  type="radio" name="color" value="panel-default"> <span>Default</span><br/> 
+                                <!-- 								<inputtype="number" id="duration" value="1" required="required"min="0" class="form-control col-md-7 col-xs-12"> -->
+                            </div>
+                        </div>
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="textarea">Description <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <textarea id="description" required="required" name="description"
+                                          class="form-control col-md-7 col-xs-12"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-md-offset-3">
+                                <!--                           <button type="submit" class="btn btn-primary">Cancel</button> -->
+                                <!--                           <button id="send" type="submit" class="btn btn-success">Submit</button> -->
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <!--         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button> -->
+                        <button type="submit" id="create-project" class="btn btn-success">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--End of New Task-->
+    <!--Save Task to Database-->       
+    <script>
+        var isUpdate = false;//used to check if the task is being update or is new task
+        var TaskStatus = "backlog";//used to hold editing task status
+        var TaskId = 0;
+        var newTask;
+        var newTaskTitle;
+        var newTaskDescription;
+        function getRadioVal(radios) {
+            var val;
+
+            // loop through list of radio buttons
+            for (var i = 0, len = radios.length; i < len; i++) {
+                if (radios[i].checked) { // radio checked?
+                    val = radios[i].value; // if so, hold its value in val
+                    break; // and break out of for loop
+                }
+            }
+            return val; // return value of checked radio or undefined if none checked
+        }
+        $('body').on('submit', 'form',
+                function (e) {
+                    e.preventDefault();
+                    var radios = document.getElementsByName("color")
+                    var title = $("#title").val();
+                    var des = $('#description').val();
+                    var color = getRadioVal(radios);
+                    var status = "backlog";
+                    var url = $('#project-form').attr('action') + "add/task";
+                    if (isUpdate === true) {
+                        url = $('#project-form').attr('action') + "update/task/" + TaskId;
+                        status = TaskStatus;
+                    }
+
+                    $
+                            .ajax({
+                                type: "POST",
+                                url: url,
+                                dataType: 'json',
+                                data: {
+                                    title: title,
+                                    description: des,
+                                    color: color,
+                                    status: status
+                                },
+                                error: function (res) {
+                            //alert("Sorry failed to connect to the server");
+                             new PNotify({
+                                        title: "Warning",
+                                        text: "Sorry failed to connect to the server",
+                                        addclass: "stack-custom",
+                                        stack: myStack,
+                                        styling: "bootstrap3",
+                                        type: "warning"
+                                    });
+                        },
+                                success: function (res) {
+                                    if (res) {
+                                        if (res.Errors) {
+                                            $("#form-response")
+                                                    .html(
+                                                            "<div class='alert alert-danger'>"
+                                                            + res.Errors
+                                                            + "</div>");
+                                        } else if (isUpdate === true) {
+                                            //Notify user
+                                            var html = '<div class="panel ' + color + '" data-id="' + TaskId + '">' +
+                                                    '<div class="panel-heading sticky-heading"><object class="sticky-title">' + title + '</object><div class="pull-right">' +
+                                                    '<i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> ' +
+                                                    '<i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>' +
+                                                    ' </div> <div class="clearfix"></div></div>' +
+                                                    ' <div class="panel-body">' + des + '</div>' +
+                                                    '</div>';
+                                            newTask.replaceWith(html);
+                                            $('#exampleModal').modal('hide');
+                                            $("#create-project").html("Create");
+                                            isUpdate = false;
+                                        } else {
+//                                                    $("#form-response")
+//                                                            .html(
+//                                                                    "<div class='alert alert-success'>Project created successfully</div>");
+                                            //window.location.href = "/projects/"+ res.id;
+                                            //alert($("#backlog").html());
+                                            $("#backlog").append('<div class="panel ' + color + '" data-id="' + res.taskId + '">' +
+                                                    '<div class="panel-heading sticky-heading"><object class="sticky-title">' + title + '</object><div class="pull-right">' +
+                                                    '<i class="sticky-control sticky-edit indicator glyphicon glyphicon-edit"></i> ' +
+                                                    '<i class="sticky-control sticky-del indicator glyphicon glyphicon-remove"></i>' +
+                                                    ' </div> <div class="clearfix"></div></div>' +
+                                                    ' <div class="panel-body">' + des + '</div>' +
+                                                    '</div>');
+
+                                            $('#exampleModal').modal('hide');
+                                        }
+                                    } else {
+                                        alert("Connection error occured");
+                                    }
+
+                                }
+                            });
+                });
+    </script>
+    <!-- End of Creating Task-->
+    <!-- Dragula Drag n' Drop Setup -->
+    <script src='/static/dist/dragula.js' th:src="@{/dist/dragula.js}"></script>
+    <!--<script src='/static/dist/kanban-settings.js'  th:src="@{/dist/kanban-settings.js}"></script>-->
+    <script>
+        var myStack = {"dir1": "down", "dir2": "left", "push": "top"};//used by pNotify plugin
+        var currentElement; //used to hold current element being dragged
+        var cElementParent; //used to hold parent that the element has been dropped
+        var pElementParent; //used to hold previous parent of the element that has been dropped
+
+        $(document).ready(function () {
+
+
+            // var tv = 0;
+            var containers = [document.getElementById('backlog'), document.getElementById('tasks-progress'), document.getElementById('progress-track'), document.getElementById('tasks-done'), document.getElementById('progress-progress'), document.getElementById('progress-done'), document.getElementById('done'), document.getElementById('testing-done'), document.getElementById('testing-processing')];
+            dragula(containers).on('drag', function (el) {
+                // el.className = el.className.replace('ex-moved', '');
+            }).on('drop', function (el, container) {
+                currentElement = el;
+                cElementParent = container;//el.parentElement;
+                updateStickyMotion(container.id, el.getAttribute("data-id"));
+
+            }).on('over', function (el, container) {
+
+            }).on('drag', function (el, container) {
+                pElementParent = container;
+                //container.className += ' ex-over';
+            }).on('out', function (el, container) {
+                /*if(tv++ > 3){
+                 dragula.cancel();
+                 alert("Cancelled sticky action");
+                 return;
+                 }*/
+                //alert("out event");
+
+
+
+            });
+        });
+    </script>
+    <!-- End of dragula setup-->
+    <!-- update the moved of sticky notes-->
+    <script>
+        function updateStickyMotion(parentId, taskId) {
+            //var url = $("#task-link").attr("href") + "/update/status/" + taskId;
+            var url = "/tasks/update/status/" + taskId;
+            //alert("Sticky has moved i.e url: " + url + " Parent: " + parentId + " taskId: " + taskId);
+            var projectId = $("#projectTitle").attr("data-id");
+            $
+                    .ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: 'json',
+                        data: {
+                            status: parentId, projectId: projectId
+                        },
+                        error: function (res) {
+                            //alert("Sorry failed to connect to the server");
+                             new PNotify({
+                                        title: "Warning",
+                                        text: "Sorry failed to connect to the server",
+                                        addclass: "stack-custom",
+                                        stack: myStack,
+                                        styling: "bootstrap3",
+                                        type: "warning"
+                                    });
+                        },
+                        success: function (res) {
+                            if (res) {
+                                if (res.Errors) {
+                                    //alert("Sorry an while updating current position of sticky note");
+                                     new PNotify({
+                                        title: "Danger",
+                                        text: "Sorry an while updating current position of sticky note",
+                                        addclass: "stack-custom",
+                                        stack: myStack,
+                                        styling: "bootstrap3",
+                                        type: "warning"
+                                    });
+                                    ret = false;
+                                } else if (res.denied) {
+
+                                    $(pElementParent).append(currentElement);
+                                    new PNotify({
+                                        title: "Warning",
+                                        text: res.denied,
+                                        addclass: "stack-custom",
+                                        stack: myStack,
+                                        styling: "bootstrap3",
+                                        type: "warning"
+                                    });
+                                   // alert(res.denied);
+                                } else {
+
+                                }
+                            } else {
+                                alert("Sorry an error occured while connecting to the server");
+
+                            }
+                        }
+                    });
+
+        }
+    </script>
+    <!-- end of update -->
+    <!-- Delete Sticky -->
+    <script>
+        $('#table-tasks').on('click', '.sticky-del', function () {
+            if (window.confirm("Are sure you want to delete the selected task?") === false) {
+                return;
+            }
+            var sticky = $(this).parent().closest($(".panel"));
+            var taskId = sticky.attr("data-id");
+            var url = "/task/delete/";
+
+            $
+                    .ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: 'json',
+                        data: {
+                            taskId: taskId
+                        },
+                        error: function (res) {
+                            //alert("Sorry failed to connect to the server");
+                             new PNotify({
+                                        title: "Warning",
+                                        text: "Sorry failed to connect to the server",
+                                        addclass: "stack-custom",
+                                        stack: myStack,
+                                        styling: "bootstrap3",
+                                        type: "warning"
+                                    });
+                        },
+                        success: function (res) {
+
+                            if (res) {
+                                sticky.remove();
+                            } else {
+                                //log error / notify user
+                            }
+                        }
+                    });
+        });
+    </script>
+    <!-- end of deleting sticky -->
+    <!-- update task -->
+    <script>
+        $('#table-tasks').on('click', '.sticky-edit', function () {
+            // var radios = document.getElementsByName("color")
+            newTaskTitle = $(this).parent().prev();
+            newTaskDescription = $(this).parent().closest($(".panel-heading")).next()
+            $("#title").val(newTaskTitle.html());
+            $('#description').val(newTaskDescription.html());
+            tinymce.get('description').setContent(newTaskDescription.html());
+            $('#exampleModal').modal('show');
+            var baseParent = newTask = $(this).parent().closest($(".panel"));
+            if (baseParent.hasClass("panel-info")) {
+                $('#radio-info').prop("checked", true);
+            } else if (baseParent.hasClass("panel-default")) {
+                $('#radio-default').prop("checked", true);
+            } else if (baseParent.hasClass("panel-danger")) {
+                $('#radio-danger').prop("checked", true);
+            } else if (baseParent.hasClass("panel-success")) {
+                $('#radio-success').prop("checked", true);
+            } else if (baseParent.hasClass("panel-warning")) {
+                $('#radio-warning').prop("checked", true);
+            } else {
+                $('#radio-primary').prop("checked", true);
+            }
+            TaskStatus = baseParent.parent().attr("id");
+            isUpdate = true;
+            TaskId = baseParent.attr("data-id");
+            $("#create-project").html("Update");
+        });
+    </script>
+    <!-- end of update task -->
+
+    <!-- Styling Script -->
+    <script>
+
+    </script>
+    <!-- End of styling script -->
+    <!-- table resize -->
+    <script src="/static/js/colResizable-1.6.min.js" th:src="@{/js/colResizable-1.6.min.js}"></script>
+    <script>
+        $(document).ready(function () {
+            $("table").colResizable({resizeMode: 'flex'});
+
+        });
+    </script>
+    <!-- end of table resize -->
+
+    <!-- Start of html editor -->
+    <script src="/static/js/tinymce/tinymce.min.js" th:src="@{/js/tinymce/tinymce.min.js}"></script>
+    <script>tinymce.init({selector: 'textarea'});</script>
+    <!-- End of html editor -->
+</body>
+</html>

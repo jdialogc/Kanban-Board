@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Projects | Kanban Boards</title>
+    <object th:remove="tag" th:include="fragment :: header"></object>
+    <script>
+        var myStack = {"dir1": "down", "dir2": "left", "push": "top"};//used by pNotify plugin
+    </script>
+</head>
+
+<body class="nav-sm">
+    <div class="container body">
+        <div class="main_container">
+            <!-- Left Column -->
+            <div th:remove="tag" th:replace="fragment :: left-column"></div>
+            <!--  End of left Column -->
+            <!-- top navigation -->
+            <div th:remove="tag" th:replace="fragment :: top-header"></div>
+            <!-- /top navigation -->
+
+            <!-- page content -->
+            <div class="right_col" role="main">
+                <div class="">
+
+                    <div class="page-title">
+                        <div class="title_left">
+                            <h3>Projects</h3>
+                        </div>
+                        <div class="title_right">
+                            <div
+                                class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                                <!--                   <div class="input-group"> -->
+                                <!--                     <input type="text" class="form-control" placeholder="Search for..."> -->
+                                <!--                     <span class="input-group-btn"> -->
+                                <!--                               <button class="btn btn-default" type="button">Go!</button> -->
+                                <!--                           </span> -->
+                                <!--                   </div> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <!--                     <h2>Form Design <small>different form elements</small></h2> -->
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><button class="btn btn-info" type="button"
+                                                    data-toggle="modal" data-target="#exampleModal">New
+                                                Project</button></li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div class="table-responsive">
+                                        <table id="datatable" class="table table-striped jambo_table bulk_action">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th>No</th>
+                                                    <th class="column-title">Title</th>
+                                                    <th class="column-title">Description</th>
+                                                    <th class="column-title">Start Date</th>
+                                                    <th class="column-title">Duration</th>
+                                                    <th class="column-title">Operations</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr th:each="project, iStatus : ${Projects}">
+                                                    <td th:text="${iStatus.count}">1</td>
+                                                    <td th:text="${project.title}" class="td-title"></td>
+                                                    <td th:utext="${project.description}" class="td-description"></td>
+                                                    <td th:text="${project.start_date}" class="td-start-date"></td>
+                                                    <td th:text="${project.duration}" class="td-duration"></td>
+                                                    <td class=" "><button	th:attr="data-id=${project.id}"	class="btn btn-info btn-edit">Edit</button> <a th:href="@{projects/}+${project.id}"
+                                                                                                                                                         class="btn btn-success">View Chart</a>
+                                                        <button	th:attr="data-id=${project.id}" class="btn btn-danger btn-delete">Delete</button>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- /page content -->
+
+            <!-- footer content -->
+
+            <div th:remove="tag" th:replace="fragment :: footer"></div>
+            <!-- /footer content -->
+        </div>
+    </div>
+
+
+    <div class="modal fade " id="exampleModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">New Project</h4>
+                </div>
+                <form class="form-horizontal form-label-left" novalidate
+                      th:action="@{project/add}" id="project-form" method="POST">
+                    <div class="modal-body">
+
+                        <div id="form-response"></div>
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="name">Title <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input id="title" class="form-control col-md-7 col-xs-12"
+                                       data-validate-length-range="6" data-validate-words="2"
+                                       name="name" placeholder="Project title i.e Eazy Taxi"
+                                       required="required" type="text">
+                            </div>
+                        </div>
+
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="occupation">Start Date <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input id="start-date" type="date" name="occupation"
+                                       data-validate-length-range="5,20"
+                                       class="optional form-control col-md-7 col-xs-12">
+                            </div>
+                        </div>
+
+
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="telephone">Duration <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input type="number" id="duration" value="1" required="required"
+                                       min="0" class="form-control col-md-7 col-xs-12">
+                            </div>
+                        </div>
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="textarea">Description <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <textarea id="description" required="required" name="textarea"
+                                          class="form-control col-md-7 col-xs-12"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-md-offset-3">
+                                <!--                           <button type="submit" class="btn btn-primary">Cancel</button> -->
+                                <!--                           <button id="send" type="submit" class="btn btn-success">Submit</button> -->
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <!--         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button> -->
+                        <button type="submit" id="create-project" class="btn btn-success">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('body').on("submit", "#project-form", function (e) {
+            e.preventDefault();
+            var title = $("#title").val();
+            var des = $('#description').val();
+            var duration = $('#duration').val();
+            var start_date = $("#start-date").val();
+            //alert("Des Value "+des+", Des Html "+$("#description").html());
+            $
+                    .ajax({
+                        type: "POST",
+                        url: $('#project-form').attr('action'),
+                        dataType: 'json',
+                        data: {
+                            title: title,
+                            description: des,
+                            duration: duration,
+                            start_date: start_date
+                        },
+                        error: function (res) {
+                            //alert("Sorry failed to connect to the server");
+                             new PNotify({
+                                        title: "Warning",
+                                        text: "Sorry failed to connect to the server",
+                                        addclass: "stack-custom",
+                                        stack: myStack,
+                                        styling: "bootstrap3",
+                                        type: "warning"
+                                    });
+                        },
+                        success: function (res) {
+                            if (res) {
+                                if (res.Errors) {
+                                    $("#form-response")
+                                            .html(
+                                                    "<div class='alert alert-danger'>"
+                                                    + res.Errors
+                                                    + "</div>");
+                                    //                                 if($(element).hasClass('btn-warning')){
+                                    //                                     $(element).html("Activate");
+                                    //                                     $(element).removeClass('btn-warning');
+                                    //                                     $(element).addClass('btn-info');
+                                    //                                 }else{
+                                    //                                     $(element).html("Suspend");
+                                    //                                     $(element).removeClass('btn-info');
+                                    //                                     $(element).addClass('btn-warning');
+                                    //                                 }
+                                } else {
+                                    $("#form-response")
+                                            .html(
+                                                    "<div class='alert alert-success'>Project created successfully</div>");
+                                    window.location.href = "/projects/"
+                                            + res.id;
+                                }
+                            } else {
+                                alert("Connection error occured");
+                            }
+                        }
+                    });
+        });
+
+        //set default todays date value
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+
+        today = yyyy + '-' + dd + '-' + mm;
+        $("#start-date").val(today);
+    </script>
+    <!-- Deleting Project -->
+    <script>
+        $('#datatable').on("click", ".btn-delete", function () {
+            if (window.confirm("Are sure you want to delete the selected project?") === false) {
+                return;
+            }
+            var projectId = $(this).attr("data-id");
+            var url = "/project/delete";
+            var elem = (this);
+
+            $
+                    .ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: 'json',
+                        data: {
+                            projectId: projectId
+                        },
+                        success: function (res) {
+
+                            if (res) {
+                                $(elem).parent().closest($("tr")).remove();
+                            } else {
+                                //log error / notify user
+                            }
+                        }
+                    });
+
+        });
+    </script>
+    <!-- End of deleting project -->
+    <!-- Start of Editing Project-->
+    <div class="modal fade" id="editProject" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog  modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">Update  Project</h4>
+                </div>
+                <form class="form-horizontal form-label-left" novalidate
+                      th:action="@{project/update}" id="form-update" method="POST">
+                    <div class="modal-body">
+
+                        <div id="form-response"></div>
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="name">Title <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input id="title-edit" class="form-control col-md-7 col-xs-12"
+                                       data-validate-length-range="6" data-validate-words="2"
+                                       name="name" placeholder="both name(s) e.g Jon Doe"
+                                       required="required" type="text">
+                            </div>
+                        </div>
+
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="occupation">Start Date <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input id="start-date-edit" type="date" name="occupation"
+                                       data-validate-length-range="5,20"
+                                       class="optional form-control col-md-7 col-xs-12">
+                            </div>
+                        </div>
+
+
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="telephone">Duration <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input type="number" id="duration-edit" value="1" required="required"
+                                       min="0" class="form-control col-md-7 col-xs-12">
+                            </div>
+                        </div>
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="textarea">Description <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <textarea id="description-edit" required="required" name="description-edit"
+                                          class="form-control col-md-7 col-xs-12"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-md-offset-3">
+                                <!--                           <button type="submit" class="btn btn-primary">Cancel</button> -->
+                                <!--                           <button id="send" type="submit" class="btn btn-success">Submit</button> -->
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <!--         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button> -->
+                        <button type="submit" id="update-project" class="btn btn-success">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        var projectId;
+        var titleEdit;
+        var descriptionEdit;
+        var durationEdit;
+        var startDateEdit;
+        $('body').on("click", ".btn-edit", function () {
+            titleEdit = $(this).parent().siblings(".td-title");
+            $("#title-edit").val(titleEdit.html());
+            descriptionEdit = $(this).parent().siblings(".td-description");
+            //$("#description-edit").val(descriptionEdit.html());
+            tinymce.get('description-edit').setContent(descriptionEdit.html());
+            durationEdit = $(this).parent().siblings(".td-duration");
+            $("#duration-edit").val(durationEdit.html());
+            startDateEdit = $(this).parent().siblings(".td-start-date");
+            $("#start-date-edit").val(startDateEdit.html());
+            projectId = $(this).attr("data-id");
+            $('#editProject').modal('show');
+        });
+
+        $('body').on("submit", "#form-update", function (e) {
+            e.preventDefault();
+            var title = $("#title-edit").val();
+            var des = $('#description-edit').val();
+            var duration = $('#duration-edit').val();
+            var start_date = $("#start-date-edit").val();
+
+            $
+                    .ajax({
+                        type: "POST",
+                        url: $('#form-update').attr('action') + "/" + projectId,
+                        dataType: 'json',
+                        data: {
+                            title: title,
+                            description: des,
+                            duration: duration,
+                            start_date: start_date
+                        },
+                        error: function (res) {
+                            //alert("Sorry failed to connect to the server");
+                             new PNotify({
+                                        title: "Warning",
+                                        text: "Sorry failed to connect to the server",
+                                        addclass: "stack-custom",
+                                        stack: myStack,
+                                        styling: "bootstrap3",
+                                        type: "warning"
+                                    });
+                        },
+                        success: function (res) {
+                            if (res) {
+                                if (res.Errors) {
+                                    $("#form-response")
+                                            .html(
+                                                    "<div class='alert alert-danger'>"
+                                                    + res.Errors
+                                                    + "</div>");
+                                    //                                 if($(element).hasClass('btn-warning')){
+                                    //                                     $(element).html("Activate");
+                                    //                                     $(element).removeClass('btn-warning');
+                                    //                                     $(element).addClass('btn-info');
+                                    //                                 }else{
+                                    //                                     $(element).html("Suspend");
+                                    //                                     $(element).removeClass('btn-info');
+                                    //                                     $(element).addClass('btn-warning');
+                                    //                                 }
+                                } else {
+//													$("#form-response")
+//															.html(
+//																	"<div class='alert alert-success'>Project update successfully</div>");
+                                    //window.location.href = "/projects/"+ res.id;
+                                    $(titleEdit).html(title);
+                                    $(descriptionEdit).html(des);
+                                    $(durationEdit).html(duration);
+                                    $(startDateEdit).html(start_date);
+                                    $("#editProject").modal('hide');
+                                }
+                            } else {
+                                alert("Connection error occured");
+                            }
+                        }
+                    });
+
+        });
+    </script>
+    <!-- End of Editing Project-->
+
+
+    <!-- Datatables -->
+    <script>
+        $(document).ready(function () {
+            var handleDataTableButtons = function () {
+                if ($("#datatable-buttons").length) {
+                    $("#datatable-buttons").DataTable({
+                        dom: "Bfrtip",
+                        buttons: [
+                            {
+                                extend: "copy",
+                                className: "btn-sm"
+                            },
+                            {
+                                extend: "csv",
+                                className: "btn-sm"
+                            },
+                            {
+                                extend: "excel",
+                                className: "btn-sm"
+                            },
+                            {
+                                extend: "pdfHtml5",
+                                className: "btn-sm"
+                            },
+                            {
+                                extend: "print",
+                                className: "btn-sm"
+                            },
+                        ],
+                        responsive: true
+                    });
+                }
+            };
+
+            TableManageButtons = function () {
+                "use strict";
+                return {
+                    init: function () {
+                        handleDataTableButtons();
+                    }
+                };
+            }();
+
+            $('#datatable').dataTable();
+            $('#datatable-keytable').DataTable({
+                keys: true
+            });
+
+            $('#datatable-responsive').DataTable();
+
+            $('#datatable-scroller').DataTable({
+                ajax: "js/datatables/json/scroller-demo.json",
+                deferRender: true,
+                scrollY: 380,
+                scrollCollapse: true,
+                scroller: true
+            });
+
+            var table = $('#datatable-fixed-header').DataTable({
+                fixedHeader: true
+            });
+
+            TableManageButtons.init();
+        });
+    </script>
+    <!-- /Datatables -->
+    <!-- table resize -->
+    <script src="/static/js/colResizable-1.6.min.js" th:src="@{/js/colResizable-1.6.min.js}"></script>
+    <script>
+        $(document).ready(function () {
+            $("table").colResizable({resizeMode: 'flex'});
+
+        });
+    </script>
+    <!-- end of table resize -->
+    <!-- Start of html editor -->
+    <script src="/static/js/tinymce/tinymce.min.js" th:src="@{/js/tinymce/tinymce.min.js}"></script>
+    <script>
+          $(document).on('ready', function () {
+              tinymce.init({selector: 'textarea'});
+              
+          });
+    </script>
+    <!-- End of html editor -->
+</body>
+</html>

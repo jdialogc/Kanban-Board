@@ -1,0 +1,10 @@
+com\cm\projects\kanban\validators\ProjectValidator.class
+com\cm\projects\kanban\services\ProjectService.class
+com\cm\projects\kanban\repositories\ProjectRepo.class
+com\cm\projects\kanban\repositories\TaskRepo.class
+com\cm\projects\kanban\controller\Forms.class
+com\cm\projects\kanban\services\ProjectServiceImpl.class
+com\cm\projects\kanban\KanbanApplication.class
+com\cm\projects\kanban\domains\Task.class
+com\cm\projects\kanban\controller\Main.class
+com\cm\projects\kanban\domains\Project.class

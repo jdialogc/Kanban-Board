@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <title>DataTables | Gentallela</title>
+    <object th:remove="tag" th:include="fragment :: header"></object>
+    <!-- Dragula css -->
+    <link href='/static/dist/dragula.css' th:href="@{/dist/dragula.css}"  rel='stylesheet' type='text/css' />
+    <!-- HtmlEditor -->
+    <link rel="stylesheet" href="/static/htmleditor/jquery.wysiwyg.css" th:href="@{/htmleditor/jquery.wysiwyg.css}" type="text/css"        media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="/static/htmleditor/src/dialogs/default.css"th:href="@{/htmleditor/src/dialogs/default.css}" type="text/css"  media="screen" charset="utf-8" />
+    <!-- Bootstrap -->
+    <style>
+        .sticky-heading {
+            cursor: grabbing;
+            cursor: -moz-grabbing;
+            cursor: -webkit-grabbing;
+        }
+        .alert-label{
+            width:15px;
+            height:15px;
+        }
+    </style>
+</head>
+
+<body class="nav-md">
+    <div class="container body">
+        <div class="main_container">
+            
+
+            <!-- Left Column -->
+            <div th:remove="tag" th:replace="fragment :: left-column"></div>
+            <!--  End of left Column -->
+            <!-- top navigation -->
+            <div th:remove="tag" th:replace="fragment :: top-header"></div>
+            <!-- /top navigation -->
+
+            <!-- page content -->
+            <div class="right_col" role="main" id="main">
+                <div class="">
+                    <div class="page-title">
+                        <div class="title_left">
+                            <h3 th:if="${project != null}" th:text="${project.title}">
+                                Project ??? <small> Tasks Progress </small>
+                            </h3>
+                        </div>
+
+
+
+                    </div>
+                    <div class="clearfix"></div>
+
+                    <div class="row">
+
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Kanban Board</h2>
+                                    <ul class="nav navbar-right panel_toolbox">
+                                        <li><button id="add-new" class="btn btn-info"
+                                                    data-toggle="modal" data-target="#exampleModal">New
+                                                Task/Story</button></li>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr class="headings">
+                                                    <th>Backlog</th>
+                                                    <th colspan="2">Tasks</th>
+                                                    <th colspan="3">In Progress</th>
+                                                    <th colspan="2">Testing</th>
+                                                    <th>Done</th>
+                                                </tr>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Processing</th>
+                                                    <th>Done</th>
+                                                    <th>Processing</th>
+                                                    <th>Track</th>
+                                                    <th>Done</th>
+                                                    <th>Processing</th>
+                                                    <th>Done</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tr class="sticky-notes" valign="top">
+                                                <!--Backlog-->
+                                                <td id="backlog" class="container">
+                                                    <object th:remove="tag"  th:each="backlog, iStatus : ${backlogs}">
+                                                        <div class="panel panel-info" th:class="@{panel}+' '+${backlog.color}" th:attr="data-id=${backlog.id}">
+                                                            <div class="panel-heading sticky-heading" th:text="${backlog.title}">
+                                                                <ul class="nav navbar-right panel_toolbox">
+                                                                    <li><a class="close-link close-sticky"><i class="fa fa-close"></i></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="panel-body"  th:text="${backlog.description}"></div>
+                                                        </div>
+                                                    </object>
+                                                </td>
+                                                <!--Tasks-->
+                                                <td id="tasks-progress" class="container">
+                                                    <object th:remove="tag"  th:each="item, iStatus : ${tasksProgress}">
+                                                        <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                            <div class="panel-heading sticky-heading" th:text="${item.title}">
+                                                                <ul class="nav navbar-right panel_toolbox">
+                                                                    <li><a class="close-link close-sticky"><i class="fa fa-close"></i></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="panel-body"  th:text="${item.description}"></div>
+                                                        </div>
+                                                    </object>
+                                                </td>
+                                                <td id="tasks-done" class="container">
+                                                    <object th:remove="tag"  th:each="item, iStatus : ${tasksDone}">
+                                                        <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                            <div class="panel-heading sticky-heading" th:text="${item.title}">
+                                                                <ul class="nav navbar-right panel_toolbox">
+                                                                    <li><a class="close-link close-sticky"><i class="fa fa-close"></i></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="panel-body"  th:text="${item.description}"></div>
+                                                        </div>
+                                                    </object>
+                                                </td>
+                                                <!--End of Tasks-->
+                                                <!--In progress-->
+                                                <td id="progress-progress" class="container">
+                                                    <object th:remove="tag"  th:each="item, iStatus : ${progressProgress}">
+                                                        <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                            <div class="panel-heading sticky-heading" th:text="${item.title}">
+                                                                <ul class="nav navbar-right panel_toolbox">
+                                                                    <li><a class="close-link close-sticky"><i class="fa fa-close"></i></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="panel-body"  th:text="${item.description}"></div>
+                                                        </div>
+                                                    </object>
+                                                <td id="progress-track" class="container">
+                                                    <object th:remove="tag"  th:each="item, iStatus : ${progressTrack}">
+                                                        <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                            <div class="panel-heading sticky-heading" th:text="${item.title}">
+                                                                <ul class="nav navbar-right panel_toolbox">
+                                                                    <li><a class="close-link close-sticky"><i class="fa fa-close"></i></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="panel-body"  th:text="${item.description}"></div>
+                                                        </div>
+                                                    </object>
+                                                </td>
+                                                <td id="progress-done" class="container">
+                                                    <object th:remove="tag"  th:each="item, iStatus : ${progressDone}">
+                                                        <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                            <div class="panel-heading sticky-heading" th:text="${item.title}">
+                                                                <ul class="nav navbar-right panel_toolbox">
+                                                                    <li><a class="close-link close-sticky"><i class="fa fa-close"></i></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="panel-body"  th:text="${item.description}"></div>
+                                                        </div>
+                                                    </object>
+                                                </td>
+                                                <!--End of Progress-->
+                                                <!--Testing-->
+                                                <td id="testing-processing" class="container">                                                    
+                                                    <object th:remove="tag"  th:each="item, iStatus : ${testingProcessing}">
+                                                        <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                            <div class="panel-heading sticky-heading" th:text="${item.title}">
+                                                                <ul class="nav navbar-right panel_toolbox">
+                                                                    <li><a class="close-link close-sticky"><i class="fa fa-close"></i></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="panel-body"  th:text="${item.description}"></div>
+                                                        </div>
+                                                    </object>
+                                                </td>
+
+                                                <!--Done-->
+                                                <td id="testing-done" class="container">
+                                                    <object th:remove="tag"  th:each="item, iStatus : ${testingDone}">
+                                                        <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                            <div class="panel-heading sticky-heading" th:text="${item.title}">
+                                                                <ul class="nav navbar-right panel_toolbox">
+                                                                    <li><a class="close-link close-sticky"><i class="fa fa-close"></i></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="panel-body"  th:text="${item.description}"></div>
+                                                        </div>
+                                                    </object>
+                                                </td>
+                                                <!--End of Done-->
+                                                <td id="done" class="container">
+                                                    <object th:remove="tag"  th:each="item, iStatus : ${done}">
+                                                        <div class="panel panel-info" th:class="@{panel}+' '+${item.color}" th:attr="data-id=${item.id}">
+                                                            <div class="panel-heading sticky-heading" th:text="${item.title}">
+                                                                <ul class="nav navbar-right panel_toolbox">
+                                                                    <li><a class="close-link close-sticky"><i class="fa fa-close"></i></a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <div class="panel-body"  th:text="${item.description}"></div>
+                                                        </div>
+                                                    </object>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+
+
+                </div>
+            </div>
+            
+        
+        <!-- /page content -->
+
+        <!-- footer content -->
+
+        <div th:remove="tag" th:replace="fragment :: footer"></div>
+        <!-- /footer content -->
+        </div>
+        </div>
+
+
+
+    <!-- Datatables -->
+    <script>
+        $(document).ready(function () {
+            //match container height to window
+            
+            
+            var handleDataTableButtons = function () {
+                if ($("#datatable-buttons").length) {
+                    $("#datatable-buttons").DataTable({
+                        dom: "Bfrtip",
+                        buttons: [{
+                                extend: "copy",
+                                className: "btn-sm"
+                            }, {
+                                extend: "csv",
+                                className: "btn-sm"
+                            }, {
+                                extend: "excel",
+                                className: "btn-sm"
+                            }, {
+                                extend: "pdfHtml5",
+                                className: "btn-sm"
+                            }, {
+                                extend: "print",
+                                className: "btn-sm"
+                            }, ],
+                        responsive: true
+                    });
+                }
+            };
+
+            TableManageButtons = function () {
+                "use strict";
+                return {
+                    init: function () {
+                        handleDataTableButtons();
+                    }
+                };
+            }();
+
+            $('#datatable').dataTable();
+            $('#datatable-keytable').DataTable({
+                keys: true
+            });
+
+            $('#datatable-responsive').DataTable();
+
+            $('#datatable-scroller').DataTable({
+                ajax: "js/datatables/json/scroller-demo.json",
+                deferRender: true,
+                scrollY: 380,
+                scrollCollapse: true,
+                scroller: true
+            });
+
+            var table = $('#datatable-fixed-header').DataTable({
+                fixedHeader: true
+            });
+
+            TableManageButtons.init();
+        });
+    </script>
+
+    <!-- update the moved of sticky notes-->
+    <object id="task-link" th:href="@{/tasks}"></object>
+    <script>
+        function updateStickyMotion(parentId, taskId) {
+            var url = $("#task-link").attr("href") + "/update/status/" + taskId;
+            alert("Sticky has moved i.e url: " + url + " Parent: " + parentId + " taskId: " + taskId);
+
+            $
+                    .ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: 'json',
+                        data: {
+                            status: parentId
+                        },
+                        success: function (res) {
+                            if (res) {
+                                if (res.Errors) {
+                                    alert("Sorry an while updating current position of sticky note");
+                                } else {
+
+                                }
+                            } else {
+                                alert("Sorry an error occured while connecting to the server");
+                            }
+                        }
+                    });
+        }
+    </script>
+    <!-- end of update -->
+    <script src='/static/dist/dragula.js' th:src="@{/dist/dragula.js}"></script>
+    <script src='/static/dist/kanban-settings.js'
+    th:src="@{/dist/kanban-settings.js}"></script>
+    <!-- /Datatables -->
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="exampleModalLabel">New Task/Story</h4>
+                </div>
+                <form class="form-horizontal form-label-left" novalidate th:if="${project != null}"
+                      th:action="@{/projects/{projectId}/add/task(projectId = ${project.id})}" id="project-form" method="POST">
+                    <div class="modal-body">
+
+                        <div id="form-response"></div>
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="name">Title <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input id="title" class="form-control col-md-7 col-xs-12"
+                                       data-validate-length-range="6" data-validate-words="2"
+                                       name="name" placeholder="both name(s) e.g Jon Doe"
+                                       required="required" type="text">
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="telephone">Color <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input type="radio" name="color" value="panel-danger"> <span style="color:#d9534f;">Red</span><br/>
+                                <input type="radio" name="color" value="panel-primary"> <span style="color:#337ab7;">Blue</span><br/>
+                                <input type="radio" name="color" value="panel-info" checked> <span style="color:#5bc0de;"> Light Blue</span><br>
+                                <input type="radio" name="color" value="panel-success"><span style="color:#26B99A;"> Green</span><br/> 
+                                <input type="radio" name="color" value="panel-warning"> <span style="color:#f0ad4e;">Orange</span><br/> 
+                                <input type="radio" name="color" value="panel-default"> <span>Default</span><br/> 
+                                <!-- 								<inputtype="number" id="duration" value="1" required="required"min="0" class="form-control col-md-7 col-xs-12"> -->
+                            </div>
+                        </div>
+                        <div class="item form-group">
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12"
+                                   for="textarea">Description <span class="required">*</span>
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <textarea id="description" required="required" name="textarea"
+                                          class="form-control col-md-7 col-xs-12"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-md-offset-3">
+                                <!--                           <button type="submit" class="btn btn-primary">Cancel</button> -->
+                                <!--                           <button id="send" type="submit" class="btn btn-success">Submit</button> -->
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <!--         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button> -->
+                        <button type="submit" id="create-project" class="btn btn-success">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+        <script>
+            var fHeight = $('footer').height();
+            var minMainHeight = $(document).height() - fHeight;
+            $('#main').css("min-height", minMainHeight);
+               // alert("Body Height: "+$(document).height()+" Container "+$("#main").height());
+            function getRadioVal(radios) {
+                var val;
+
+                // loop through list of radio buttons
+                for (var i = 0, len = radios.length; i < len; i++) {
+                    if (radios[i].checked) { // radio checked?
+                        val = radios[i].value; // if so, hold its value in val
+                        break; // and break out of for loop
+                    }
+                }
+                return val; // return value of checked radio or undefined if none checked
+            }
+            $('form')
+                    .submit(
+                            function (e) {
+                                e.preventDefault();
+                                var radios = document.getElementsByName("color")
+                                var title = $("#title").val();
+                                var des = $('#description').val();
+                                var color = getRadioVal(radios);
+                                var status = "backlog";
+
+                                $
+                                        .ajax({
+                                            type: "POST",
+                                            url: $('#project-form').attr('action'),
+                                            dataType: 'json',
+                                            data: {
+                                                title: title,
+                                                description: des,
+                                                color: color,
+                                                status: status
+                                            },
+                                            success: function (res) {
+                                                if (res) {
+                                                    if (res.Errors) {
+                                                        $("#form-response")
+                                                                .html(
+                                                                        "<div class='alert alert-danger'>"
+                                                                        + res.Errors
+                                                                        + "</div>");
+                                                    } else {
+                                                        $("#form-response")
+                                                                .html(
+                                                                        "<div class='alert alert-success'>Project created successfully</div>");
+                                                        //window.location.href = "/projects/"+ res.id;
+                                                        //alert($("#backlog").html());
+                                                        $("#backlog").append('<div class="panel ' + color + '" data-id="' + res.taskId + '">' +
+                                                                '<div class="panel-heading sticky-heading">' + title + '</div>' +
+                                                                ' <div class="panel-body">' + des + '</div>' +
+                                                                '</div>');
+
+                                                        $('#exampleModal').modal('hide');
+                                                    }
+                                                } else {
+                                                    alert("Connection error occured");
+                                                }
+                                            }
+                                        });
+                            });
+        </script>
+    <!-- Html editor -->
+    <!-- 		<script src="/static/htmlEditor/lib/jquery1.5.js" type="text/javascript" th:href="@{/htmlEditor/lib/jquery1.5.js}" charset="utf-8"></script> -->
+    
+    
+    <script src="/static/htmleditor/src/dialogs/default.js"
+            type="text/javascript" th:src="@{/htmleditor/src/dialogs/default.js}"
+    charset="utf-8"></script>
+    <script type="text/javascript"
+            src="/static/htmleditor/controls/wysiwyg.image.js"
+    th:src="@{/htmleditor/controls/wysiwyg.image.js}"></script>
+    <script type="text/javascript" charset="utf-8">
+        //<![CDATA[
+        $(document).ready(function () {
+            $('#description').wysiwyg({
+                controls: "bold,italic,|,undo,redo,image"
+            });
+        });
+        //]]>
+    </script>
+    <!-- End of Html editor -->
+</body>
+</html>
